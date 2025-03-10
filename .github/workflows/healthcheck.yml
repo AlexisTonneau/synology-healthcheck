@@ -2,7 +2,7 @@ name: Server Health Check
 
 on:
   schedule:
-    - cron: "0 * * * *" # Runs every hour
+    - cron: "0 8 * * *" # Runs every hour
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -17,11 +17,6 @@ jobs:
           echo "Server returned status: $STATUS"
           echo "status=$STATUS" >> $GITHUB_ENV
       
-      - name: Download a single artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: last-heathcheck
-
       - name: Get Previous Status
         id: prev_status
         run: |
@@ -36,7 +31,7 @@ jobs:
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: last-heathcheck
+          name: last-healthcheck
           path: /tmp/server_status
 
       - name: Send Email Notification if Server is Down
