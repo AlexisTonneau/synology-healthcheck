@@ -12,7 +12,7 @@ jobs:
       - name: Check Server Health
         id: health_check
         run: |
-          URL="https://home.labarjolle.com/"
+          URL="https://sonarr.labarjolle.com/"
           STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
           echo "Server returned status: $STATUS"
           echo "status=$STATUS" >> $GITHUB_ENV
