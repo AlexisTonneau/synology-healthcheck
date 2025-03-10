@@ -34,7 +34,7 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 587
-          username: alexis.tonneaugm@gmail.com
+          username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASS }}
           subject: "Server Down Alert"
           body: "CazNAS is down! Last successful health check was an hour ago."
