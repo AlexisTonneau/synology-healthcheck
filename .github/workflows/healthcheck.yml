@@ -12,10 +12,15 @@ jobs:
       - name: Check Server Health
         id: health_check
         run: |
-          URL="https://sonarr.labarjolle.com/"
+          URL="https://home.labarjolle.com/"
           STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
           echo "Server returned status: $STATUS"
           echo "status=$STATUS" >> $GITHUB_ENV
+      
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: last-heathcheck
 
       - name: Get Previous Status
         id: prev_status
@@ -28,6 +33,12 @@ jobs:
         run: |
           echo "$status" > /tmp/server_status
 
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: last-heathcheck
+          path: /tmp/server_status
+
       - name: Send Email Notification if Server is Down
         if: env.status != '200' && env.prev_status == '200'
         uses: dawidd6/action-send-mail@v3
@@ -39,4 +50,19 @@ jobs:
           subject: "Server Down Alert"
           body: "CazNAS is down! Last successful health check was an hour ago."
           to: "alexis.tonneaugm@gmail.com"
-          from: "GitHub Actions"
+          cc: "casimirborgeaud@gmail.com"
+          from: "CazNAS Health Check"
+
+      - name: Send Email Notification if Server is Back
+        if: env.status == '200' && env.prev_status != '200'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "CazNAS is back up!"
+          body: "CazNAS is back up! Tu peux retourner à tes animes préférés."
+          to: "alexis.tonneaugm@gmail.com"
+          cc: "casimirborgeaud@gmail.com"
+          from: "CazNAS Health Check"
