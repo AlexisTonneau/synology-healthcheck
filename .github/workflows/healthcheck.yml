@@ -1,0 +1,42 @@
+name: Server Health Check
+
+on:
+  schedule:
+    - cron: "0 * * * *" # Runs every hour
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Server Health
+        id: health_check
+        run: |
+          URL="https://home.labarjolle.com/"
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$URL")
+          echo "Server returned status: $STATUS"
+          echo "status=$STATUS" >> $GITHUB_ENV
+
+      - name: Get Previous Status
+        id: prev_status
+        run: |
+          PREV_STATUS=$(cat /tmp/server_status 2>/dev/null || echo "200")
+          echo "Previous status: $PREV_STATUS"
+          echo "prev_status=$PREV_STATUS" >> $GITHUB_ENV
+
+      - name: Save Current Status
+        run: |
+          echo "$status" > /tmp/server_status
+
+      - name: Send Email Notification if Server is Down
+        if: env.status != '200' && env.prev_status == '200'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: alexis.tonneaugm@gmail.com
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: "Server Down Alert"
+          body: "CazNAS is down! Last successful health check was an hour ago."
+          to: "alexis.tonneaugm@gmail.com"
+          from: "GitHub Actions"
