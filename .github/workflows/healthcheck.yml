@@ -17,10 +17,10 @@ jobs:
           echo "Server returned status: $STATUS"
           echo "status=$STATUS" >> $GITHUB_ENV
       
-#      - name: Download a single artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: last-heathcheck
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: last-heathcheck
 
       - name: Get Previous Status
         id: prev_status
