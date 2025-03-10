@@ -32,7 +32,7 @@ jobs:
         if: env.status != '200' && env.prev_status == '200'
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
+          server_address: ${{ secrets.SMTP_SERVER }}
           server_port: 587
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASS }}
